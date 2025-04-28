@@ -34,14 +34,14 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) fixed;
             background-color: #1a1a1a; /* Fallback for overscroll */
-            overflow: auto;
-            overscroll-behavior: none;
+            overflow-y: scroll; /* Allow natural overscrolling */
         }
         body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
             background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) fixed;
+            background-color: #1a1a1a;
             font-family: 'Roboto', sans-serif;
             color: #ffffff;
             overflow-x: hidden;
@@ -385,6 +385,35 @@
                 element.classList.remove('active');
             });
         });
+
+        // Pull-to-refresh logic for mobile
+        if (isMobile) {
+            let touchStartY = 0;
+            let pullDistance = 0;
+            const pullThreshold = 150; // Distance in pixels to trigger reload
+
+            document.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+                // Only start tracking if at the top of the page
+                if (window.scrollY === 0) {
+                    pullDistance = 0;
+                }
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (window.scrollY === 0) {
+                    const touchY = e.touches[0].clientY;
+                    pullDistance = touchY - touchStartY;
+                }
+            });
+
+            document.addEventListener('touchend', () => {
+                if (pullDistance > pullThreshold) {
+                    window.location.reload();
+                }
+                pullDistance = 0;
+            });
+        }
 
         // Countdown logic
         const waves = [
