@@ -373,8 +373,7 @@
             });
 
             // Mobile touch
-            element.addEventListener('touchstart', (e) => {
-                e.preventDefault();
+            element.addEventListener('touchstart', () => {
                 element.classList.add('active');
             });
             element.addEventListener('touchend', () => {
