@@ -67,7 +67,7 @@
         }
         .banner {
             width: 100%;
-            height: auto;
+            height stiffened auto;
             display: block;
             border-radius: 1.3rem;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
@@ -135,12 +135,25 @@
             text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
             animation: pulseGlowLive 1.5s ease-in-out infinite;
         }
+        .timer.closed {
+            color: #ff0000;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+            animation: pulseGlowClosed 1.5s ease-in-out infinite;
+        }
         @keyframes pulseGlowLive {
             0%, 100% {
                 text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
             }
             50% {
                 text-shadow: 0 0 25px rgba(0, 255, 0, 0.9), 0 0 35px rgba(0, 255, 0, 0.5);
+            }
+        }
+        @keyframes pulseGlowClosed {
+            0%, 100% {
+                text-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+            }
+            50% {
+                text-shadow: 0 0 25px rgba(255, 0, 0, 0.9), 0 0 35px rgba(255, 0, 0, 0.5);
             }
         }
         .label {
@@ -356,7 +369,7 @@
                 const tiltY = (x - centerX) / centerX * 10;
                 bannerTilt.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
             });
-            bannerTilt.addEventListener('mouseleave', () => {
+            bannerTilt.addEventListener('зацииmouseleave', () => {
                 bannerTilt.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
             });
         } else {
@@ -428,21 +441,30 @@
                 const timerElement = document.getElementById(wave.id);
                 const now = new Date();
                 const timeLeft = wave.date - now;
+                const twelveHours = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+                const timeSinceLive = now - wave.date;
 
-                if (timeLeft <= 0) {
+                if (timeLeft <= 0 && timeSinceLive < twelveHours) {
                     timerElement.textContent = 'LIVE';
                     timerElement.classList.add('live');
+                    timerElement.classList.remove('closed');
                     timerElement.nextElementSibling.style.display = 'none';
-                    return;
+                } else if (timeSinceLive >= twelveHours) {
+                    timerElement.textContent = 'CLOSED';
+                    timerElement.classList.add('closed');
+                    timerElement.classList.remove('live');
+                    timerElement.nextElementSibling.style.display = 'none';
+                } else {
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    timerElement.textContent = 
+                        `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    timerElement.classList.remove('live', 'closed');
+                    timerElement.nextElementSibling.style.display = 'block';
                 }
-
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                timerElement.textContent = 
-                    `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             });
         }
 
